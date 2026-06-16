@@ -10,10 +10,8 @@ class RekamMedisImport implements WithMultipleSheets, SkipsUnknownSheets
     public function sheets(): array
     {
         return [
-            'database'    => new EmployeesImport(),
-            'data_pasien' => new PatientsImport(),
-            'rekam_medis' => new MedicalRecordsImport(),
-            'mcu'         => new McuRecordsImport(),
+            0 => new PatientsImport(), // Sheet 1: Data Pasien
+            1 => new MedicalRecordsImport(), // Sheet 2: Data Rekam Medis
         ];
     }
 

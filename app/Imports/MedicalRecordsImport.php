@@ -17,10 +17,20 @@ class MedicalRecordsImport implements ToModel, WithHeadingRow
             return null;
         }
 
-        // Find patient by id_rm_p or name (fallback)
+        // Find patient by RM number or name
         $patient = null;
-        if (isset($row['nama_pasien'])) {
-            $patient = Patient::where('id_rm_p', $row['nama_pasien'])->first();
+        
+        if (isset($row['no_rm'])) {
+            $patient = Patient::where('no_rm', $row['no_rm'])->orWhere('medical_record_number', $row['no_rm'])->first();
+        }
+        if (!$patient && isset($row['id_rm'])) {
+            $patient = Patient::where('id_rm_p', $row['id_rm'])
+                ->orWhere('no_rm', $row['id_rm'])
+                ->orWhere('medical_record_number', $row['id_rm'])->first();
+        }
+        if (!$patient && isset($row['nama_pasien'])) {
+            $patient = Patient::where('name', $row['nama_pasien'])
+                ->orWhere('id_rm_p', $row['nama_pasien'])->first();
         }
         if (!$patient && isset($row['nama'])) {
             $patient = Patient::where('name', $row['nama'])->first();
