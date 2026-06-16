@@ -38,6 +38,11 @@
             <!-- Tab Pasien Baru -->
             <div x-show="tab === 'baru'" class="space-y-5" style="display: none;">
                 <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">NIK (Nomor Induk Kependudukan)</label>
+                    <input type="text" name="nik" maxlength="16" placeholder="16 digit angka NIK" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 outline-none transition text-slate-800 tracking-wide" inputmode="numeric">
+                    <p class="text-xs text-slate-400 mt-1">Opsional — bisa dilengkapi nanti saat pemeriksaan.</p>
+                </div>
+                <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Lengkap Sesuai KTP <span class="text-red-500">*</span></label>
                     <input type="text" name="name" :required="tab === 'baru'" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 outline-none transition text-slate-800">
                 </div>
@@ -58,9 +63,21 @@
                 </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Keluhan di Pendaftaran Khusus <span class="text-red-500">*</span></label>
-                <textarea required name="complaint" rows="3" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 outline-none transition text-slate-800 resize-none"></textarea>
+            <div class="pt-4 border-t border-slate-100 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Poliklinik Tujuan <span class="text-red-500">*</span></label>
+                    <select required name="polyclinic_id" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 outline-none bg-white transition text-slate-800">
+                        <option value="">-- Pilih Poliklinik --</option>
+                        @foreach($polyclinics as $poli)
+                            <option value="{{ $poli->id }}">{{ $poli->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Keluhan / Catatan Pendaftaran <span class="text-red-500">*</span></label>
+                    <textarea required name="complaint" rows="3" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 outline-none transition text-slate-800 resize-none"></textarea>
+                </div>
             </div>
 
             <div class="pt-4">

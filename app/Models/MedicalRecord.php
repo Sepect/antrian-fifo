@@ -12,7 +12,17 @@ class MedicalRecord extends Model
         'queue_id', 
         'diagnosis', 
         'action_taken', 
-        'prescription'
+        'prescription',
+        'id_rm',
+        'visit_date',
+        'polyclinic_id',
+        'anamnese',
+        'pemeriksaan_fisik',
+        'keterangan'
+    ];
+
+    protected $casts = [
+        'visit_date' => 'date',
     ];
 
     public function patient(): BelongsTo
@@ -23,5 +33,10 @@ class MedicalRecord extends Model
     public function queue(): BelongsTo
     {
         return $this->belongsTo(Queue::class);
+    }
+
+    public function polyclinic(): BelongsTo
+    {
+        return $this->belongsTo(Polyclinic::class);
     }
 }

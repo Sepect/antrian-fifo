@@ -1,15 +1,15 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="w-full max-w-xl mx-auto px-4 mt-8 flex flex-col items-center">
+<div class="w-full max-w-xl mx-auto px-4 sm:px-6 mt-6 sm:mt-8 flex flex-col items-center">
     
-    <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-blue-900 mb-2">Pendaftaran Antrian</h1>
-        <p class="text-slate-600">Dapatkan nomor antrian dan Nomor Rekam Medis (RM) Anda tanpa perlu mengantre fisik.</p>
+    <div class="mb-6 sm:mb-8 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">Pendaftaran Antrian</h1>
+        <p class="text-slate-600 text-sm sm:text-base">Dapatkan nomor antrian dan Nomor Rekam Medis (RM) Anda tanpa perlu mengantre fisik.</p>
     </div>
 
     @if($errors->any())
-        <div class="w-full mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm">
+        <div class="w-full mb-4 sm:mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 rounded shadow-sm">
             <p class="font-bold text-sm">Terdapat Kesalahan</p>
             <ul class="list-disc list-inside text-sm mt-1">
                 @foreach($errors->all() as $error)
@@ -23,34 +23,39 @@
         
         <!-- Tabs -->
         <div class="flex border-b border-slate-200">
-            <button type="button" @click="tab = 'lama'" :class="tab === 'lama' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'" class="flex-1 py-4 text-center font-bold text-sm transition">Pasien Lama / Kontrol</button>
-            <button type="button" @click="tab = 'baru'" :class="tab === 'baru' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'" class="flex-1 py-4 text-center font-bold text-sm transition">Pasien Baru</button>
+            <button type="button" @click="tab = 'lama'" :class="tab === 'lama' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'" class="flex-1 py-3 sm:py-4 text-center font-bold text-xs sm:text-sm transition">Pasien Lama / Kontrol</button>
+            <button type="button" @click="tab = 'baru'" :class="tab === 'baru' ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'" class="flex-1 py-3 sm:py-4 text-center font-bold text-xs sm:text-sm transition">Pasien Baru</button>
         </div>
 
-        <form method="POST" action="/register" class="p-6 sm:p-8 space-y-5">
+        <form method="POST" action="/register" class="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5">
             @csrf
             
             <input type="hidden" name="patient_type" x-model="tab">
 
             <!-- Tab Pasien Lama -->
             <div x-show="tab === 'lama'" class="space-y-4">
-                <div class="bg-blue-50 p-4 rounded border border-blue-100 mb-4">
+                <div class="bg-blue-50 p-3 sm:p-4 rounded border border-blue-100 mb-4">
                     <p class="text-sm text-blue-800">Jika Anda sudah pernah berobat ke klinik kami, Anda tidak perlu mengisi ulang seluruh biodata. Cukup masukkan No. RM Anda.</p>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">No. Rekam Medis (RM) <span class="text-red-500">*</span></label>
-                    <input type="text" name="medical_record_number" placeholder="Contoh: RM-0001" :required="tab === 'lama'" class="w-full px-4 py-3 rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors text-slate-800 font-bold tracking-wider text-xl uppercase">
+                    <input type="text" name="medical_record_number" placeholder="Contoh: RM-0001" :required="tab === 'lama'" class="w-full px-4 py-3 rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors text-slate-800 font-bold tracking-wider text-lg sm:text-xl uppercase">
                 </div>
             </div>
 
             <!-- Tab Pasien Baru -->
-            <div x-show="tab === 'baru'" class="space-y-5" style="display: none;">
+            <div x-show="tab === 'baru'" class="space-y-4 sm:space-y-5" style="display: none;">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">NIK (Nomor Induk Kependudukan)</label>
+                    <input type="text" name="nik" maxlength="16" placeholder="16 digit angka NIK" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-slate-800 tracking-wide" inputmode="numeric">
+                    <p class="text-xs text-slate-400 mt-1">Opsional — bisa dilengkapi nanti oleh perawat.</p>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Lengkap Sesuai KTP <span class="text-red-500">*</span></label>
                     <input type="text" name="name" :required="tab === 'baru'" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-slate-800">
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">No. WhatsApp/HP Aktif</label>
                         <input type="tel" name="phone" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-slate-800">
@@ -67,12 +72,12 @@
             </div>
 
             <div class="pt-2 border-t border-slate-100">
-                <label class="block text-sm font-semibold text-slate-700 mb-2 mt-4">Keluhan Utama Hari Ini <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2 mt-3 sm:mt-4">Keluhan Utama Hari Ini <span class="text-red-500">*</span></label>
                 <textarea required name="complaint" rows="3" class="w-full px-4 py-2.5 rounded-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-slate-800 resize-none" placeholder="Misal: Demam menggigil sejak 3 hari yang lalu dll..."></textarea>
             </div>
 
-            <div class="pt-4">
-                <button type="submit" class="w-full py-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg transition shadow-sm">
+            <div class="pt-3 sm:pt-4">
+                <button type="submit" class="w-full py-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-base sm:text-lg transition shadow-sm active:scale-[0.98]">
                     Daftar & Ambil Antrian
                 </button>
             </div>

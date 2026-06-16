@@ -30,6 +30,7 @@ class GuestController extends Controller
         } else {
             $request->validate([
                 'name' => 'required|string|max:255',
+                'nik' => 'nullable|string|max:16',
                 'phone' => 'nullable|string|max:20',
                 'gender' => 'nullable|in:L,P',
             ]);
@@ -43,6 +44,7 @@ class GuestController extends Controller
 
             $patient = Patient::create([
                 'name' => $request->name,
+                'nik' => $request->nik,
                 'phone' => $request->phone,
                 'gender' => $request->gender,
                 'medical_record_number' => $newNumber,
@@ -73,10 +75,12 @@ class GuestController extends Controller
             'screening_notes' => $request->complaint,
         ]);
 
-        return redirect('/status')->with('success', [
-            'number' => $queueNumber,
-            'rm' => $patient->medical_record_number
-        ]);
+        return redirect('/status-display?medical_record_number=' . urlencode($patient->medical_record_number))
+            ->with('registration_success', [
+                'number' => $queueNumber,
+                'rm' => $patient->medical_record_number,
+                'booking_code' => $bookingCode,
+            ]);
     }
 
     public function showStatus()

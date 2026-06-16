@@ -18,7 +18,9 @@ class Queue extends Model
         'total_score', 
         'priority', 
         'status', 
-        'screening_notes'
+        'screening_notes',
+        'polyclinic_id',
+        'is_mcu'
     ];
 
     protected $casts = [
@@ -43,5 +45,10 @@ class Queue extends Model
     public function medicalRecord(): HasOne
     {
         return $this->hasOne(MedicalRecord::class);
+    }
+
+    public function polyclinic(): BelongsTo
+    {
+        return $this->belongsTo(Polyclinic::class);
     }
 }

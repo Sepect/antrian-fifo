@@ -11,35 +11,85 @@
         <h1 class="text-2xl font-bold text-blue-900">Rekam Jejak Medis Komprehensif (RM)</h1>
     </div>
 
+    @if(session('message'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded" role="alert">
+            <p class="font-bold">{{ session('message') }}</p>
+        </div>
+    @endif
+
     <!-- Patient Header Card -->
-    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden flex flex-col md:flex-row gap-6 p-6">
-        <div class="md:w-1/4 flex flex-col items-center justify-center border-r border-slate-100 pr-0 md:pr-6">
-            <div class="w-24 h-24 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-4xl shadow-sm border border-blue-200 mb-4">
-                {{ strtoupper(substr($patient->name, 0, 2)) }}
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+        <div class="flex flex-col md:flex-row gap-6 p-6">
+            <div class="md:w-1/4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-6">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-3xl sm:text-4xl shadow-sm border border-blue-200 mb-3 sm:mb-4">
+                    {{ strtoupper(substr($patient->name, 0, 2)) }}
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 text-center">{{ $patient->name }}</h2>
+                <div class="mt-2 bg-blue-50 text-blue-800 font-bold px-3 py-1 rounded w-full text-center border border-blue-100 uppercase tracking-widest text-sm">
+                    {{ $patient->medical_record_number ?? 'Belum ada RM' }}
+                </div>
+                @if($patient->age !== null)
+                    <div class="mt-2 bg-emerald-50 text-emerald-700 font-semibold px-3 py-1 rounded w-full text-center border border-emerald-100 text-sm">
+                        {{ $patient->age }} Tahun
+                    </div>
+                @endif
             </div>
-            <h2 class="text-xl font-bold text-slate-800 text-center">{{ $patient->name }}</h2>
-            <div class="mt-2 bg-blue-50 text-blue-800 font-bold px-3 py-1 rounded w-full text-center border border-blue-100 uppercase tracking-widest">
-                {{ $patient->medical_record_number ?? 'Belum ada RM' }}
+            
+            <div class="md:w-3/4 grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">NIK</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->nik ?? 'Belum diisi' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Jenis Kelamin</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->gender === 'L' ? 'Laki-laki (Male)' : ($patient->gender === 'P' ? 'Perempuan (Female)' : 'Belum dikonfirmasi') }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Tanggal Lahir</p>
+                    <p class="text-sm font-semibold text-slate-800">
+                        @if($patient->birth_date)
+                            {{ $patient->birth_date->translatedFormat('d F Y') }}
+                            <span class="text-slate-500 font-normal">({{ $patient->age }} tahun)</span>
+                        @else
+                            Belum diisi
+                        @endif
+                    </p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Agama</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->religion ?? 'Belum diisi' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Pekerjaan</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->occupation ?? 'Belum diisi' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">No. HP / Kontak Utama</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->phone ?? 'Tidak ada data kontak' }}</p>
+                </div>
+                <div class="sm:col-span-2">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Alamat</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->address ?? 'Belum diisi' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Total Kunjungan</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->medicalRecords->count() }} Kunjungan Tercatat</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Pendaftaran Pertama</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $patient->created_at->translatedFormat('d F Y, H:i') }}</p>
+                </div>
             </div>
         </div>
-        
-        <div class="md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-            <div>
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Jenis Kelamin</p>
-                <p class="text-sm font-semibold text-slate-800">{{ $patient->gender === 'L' ? 'Laki-laki (Male)' : ($patient->gender === 'P' ? 'Perempuan (Female)' : 'Belum dikonfirmasi') }}</p>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">No. HP / Kontak Utama</p>
-                <p class="text-sm font-semibold text-slate-800">{{ $patient->phone ?? 'Tidak ada data kontak' }}</p>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Total Kunjungan</p>
-                <p class="text-sm font-semibold text-slate-800">{{ $patient->medicalRecords->count() }} Kunjungan Tercatat</p>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 uppercase tracking-wider font-bold mb-1">Pendaftaran Pertama</p>
-                <p class="text-sm font-semibold text-slate-800">{{ $patient->created_at->translatedFormat('d F Y, H:i') }}</p>
-            </div>
+
+        <!-- Edit Button -->
+        <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+            <a href="/staff/patients/{{ $patient->id }}/edit" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-amber-50 border border-amber-200 text-amber-700 font-semibold text-sm hover:bg-amber-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Data Pasien
+            </a>
         </div>
     </div>
 

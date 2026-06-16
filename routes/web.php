@@ -28,6 +28,8 @@ Route::middleware('auth')->prefix('staff')->group(function () {
     // Patient Directory (Accessible by Both)
     Route::get('/patients', [\App\Http\Controllers\PatientController::class, 'index']);
     Route::get('/patients/{patient}', [\App\Http\Controllers\PatientController::class, 'show']);
+    Route::get('/patients/{patient}/edit', [\App\Http\Controllers\PatientController::class, 'edit']);
+    Route::post('/patients/{patient}/update', [\App\Http\Controllers\PatientController::class, 'update']);
     // Perawat Routes
     Route::middleware('role:perawat')->group(function () {
         Route::post('/queue/{queue}/call', [StaffController::class, 'callPatient']);
@@ -39,13 +41,15 @@ Route::middleware('auth')->prefix('staff')->group(function () {
         Route::post('/screening/{queue}', [ScreeningController::class, 'store']);
 
         Route::get('/register-patient', function () {
-            return view('staff.register-patient');
+            $polyclinics = \App\Models\Polyclinic::all();
+            return view('staff.register-patient', compact('polyclinics'));
         });
         
         Route::post('/register-patient', function (\Illuminate\Http\Request $request) {
             $request->validate([
                 'patient_type' => 'required|in:baru,lama',
                 'complaint' => 'required|string',
+                'polyclinic_id' => 'required|exists:polyclinics,id',
             ]);
 
             if ($request->patient_type === 'lama') {
@@ -56,6 +60,7 @@ Route::middleware('auth')->prefix('staff')->group(function () {
             } else {
                 $request->validate([
                     'name' => 'required|string|max:255',
+                    'nik' => 'nullable|string|max:16',
                     'phone' => 'nullable|string|max:20',
                     'gender' => 'nullable|in:L,P',
                 ]);
@@ -69,6 +74,7 @@ Route::middleware('auth')->prefix('staff')->group(function () {
 
                 $patient = \App\Models\Patient::create([
                     'name' => $request->name,
+                    'nik' => $request->nik,
                     'phone' => $request->phone,
                     'gender' => $request->gender,
                     'medical_record_number' => $newNumber,
@@ -85,11 +91,16 @@ Route::middleware('auth')->prefix('staff')->group(function () {
                 return redirect('/staff/dashboard')->with('error', 'Pasien sudah memiliki antrean aktif hari ini.');
             }
 
-            $lastQueue = \App\Models\Queue::where('queue_date', $today)->orderBy('queue_number', 'desc')->first();
+            // Validasi antrean poli
+            $lastQueue = \App\Models\Queue::where('queue_date', $today)
+                ->where('polyclinic_id', $request->polyclinic_id)
+                ->orderBy('queue_number', 'desc')
+                ->first();
             $queueNumber = $lastQueue ? $lastQueue->queue_number + 1 : 1;
 
             $queue = \App\Models\Queue::create([
                 'patient_id' => $patient->id,
+                'polyclinic_id' => $request->polyclinic_id,
                 'registered_by' => auth()->id(),
                 'queue_date' => $today,
                 'queue_number' => $queueNumber,
@@ -114,5 +125,13 @@ Route::middleware('auth')->prefix('staff')->group(function () {
         Route::post('/users', [\App\Http\Controllers\UserController::class, 'store']);
         Route::post('/users/{user}/update', [\App\Http\Controllers\UserController::class, 'update']);
         Route::post('/users/{user}/delete', [\App\Http\Controllers\UserController::class, 'destroy']);
+
+        Route::get('/import', [\App\Http\Controllers\Admin\ImportController::class, 'index'])->name('admin.import.index');
+        Route::post('/import', [\App\Http\Controllers\Admin\ImportController::class, 'store'])->name('admin.import.store');
+
+        Route::get('/polyclinics', [\App\Http\Controllers\Admin\PolyclinicController::class, 'index'])->name('admin.polyclinics.index');
+        Route::post('/polyclinics', [\App\Http\Controllers\Admin\PolyclinicController::class, 'store'])->name('admin.polyclinics.store');
+        Route::post('/polyclinics/{polyclinic}/update', [\App\Http\Controllers\Admin\PolyclinicController::class, 'update'])->name('admin.polyclinics.update');
+        Route::post('/polyclinics/{polyclinic}/delete', [\App\Http\Controllers\Admin\PolyclinicController::class, 'destroy'])->name('admin.polyclinics.destroy');
     });
 });

@@ -23,28 +23,28 @@
             @endif
         </div>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white border text-center border-slate-200 rounded-lg p-5 shadow-sm border-l-4 border-l-blue-500">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total Hari Ini</span>
-                <span class="text-3xl font-black text-blue-900 leading-none">{{ $stats['total'] }}</span>
+        <!-- Stats Grid — responsive: 2 cols on mobile, 4 on desktop -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div class="bg-white border text-center border-slate-200 rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-l-blue-500">
+                <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Total Hari Ini</span>
+                <span class="text-2xl sm:text-3xl font-black text-blue-900 leading-none">{{ $stats['total'] }}</span>
             </div>
 
             <div
-                class="bg-white border text-center border-slate-200 rounded-lg p-5 shadow-sm border-l-4 border-l-amber-400">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Menunggu</span>
-                <span class="text-3xl font-black text-amber-600 leading-none">{{ $stats['menunggu'] }}</span>
+                class="bg-white border text-center border-slate-200 rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-l-amber-400">
+                <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Menunggu</span>
+                <span class="text-2xl sm:text-3xl font-black text-amber-600 leading-none">{{ $stats['menunggu'] }}</span>
             </div>
 
-            <div class="bg-white border text-center border-slate-200 rounded-lg p-5 shadow-sm border-l-4 border-l-red-500">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Darurat</span>
-                <span class="text-3xl font-black text-red-600 leading-none">{{ $stats['darurat'] }}</span>
+            <div class="bg-white border text-center border-slate-200 rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-l-red-500">
+                <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Darurat</span>
+                <span class="text-2xl sm:text-3xl font-black text-red-600 leading-none">{{ $stats['darurat'] }}</span>
             </div>
 
             <div
-                class="bg-white border text-center border-slate-200 rounded-lg p-5 shadow-sm border-l-4 border-l-green-500">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Selesai</span>
-                <span class="text-3xl font-black text-green-600 leading-none">{{ $stats['selesai'] }}</span>
+                class="bg-white border text-center border-slate-200 rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-l-green-500">
+                <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Selesai</span>
+                <span class="text-2xl sm:text-3xl font-black text-green-600 leading-none">{{ $stats['selesai'] }}</span>
             </div>
         </div>
 
@@ -55,11 +55,18 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
+                <p class="font-bold">Error</p>
+                <p>{{ session('error') }}</p>
+            </div>
+        @endif
+
         @if(auth()->user()->role === 'perawat')
             <!-- Queue Table -->
             <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mt-6">
-                <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <div class="px-4 sm:px-5 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
                         Daftar Antrean Berjalan ({{ count($queues) }} Active)
                     </h3>
                 </div>
@@ -68,28 +75,39 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-white text-slate-500 text-xs uppercase tracking-wider font-bold">
-                                <th class="p-4 border-b border-slate-200">No. Antrian</th>
-                                <th class="p-4 border-b border-slate-200">Nama Pasien</th>
-                                <th class="p-4 border-b border-slate-200">Status Prioritas</th>
-                                <th class="p-4 border-b border-slate-200">Progres</th>
-                                <th class="p-4 border-b border-slate-200 text-right">Aksi</th>
+                                <th class="p-3 sm:p-4 border-b border-slate-200">No.</th>
+                                <th class="p-3 sm:p-4 border-b border-slate-200">Pasien</th>
+                                <th class="p-3 sm:p-4 border-b border-slate-200 hidden sm:table-cell">Prioritas</th>
+                                <th class="p-3 sm:p-4 border-b border-slate-200 hidden md:table-cell">Progres</th>
+                                <th class="p-3 sm:p-4 border-b border-slate-200 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-sm">
                             @forelse($queues as $q)
                                 <tr
                                     class="hover:bg-blue-50/50 transition-colors {{ $q->priority == 'darurat' ? 'bg-red-50/20' : '' }}">
-                                    <td class="p-4">
+                                    <td class="p-3 sm:p-4">
                                         <span
-                                            class="inline-flex w-8 h-8 items-center justify-center {{ $q->priority == 'darurat' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-800' }} font-bold rounded border border-slate-200">
+                                            class="inline-flex w-8 h-8 items-center justify-center {{ $q->priority == 'darurat' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-800' }} font-bold rounded border border-slate-200 text-sm">
                                             {{ $q->queue_number }}
                                         </span>
                                     </td>
-                                    <td class="p-4">
+                                    <td class="p-3 sm:p-4">
                                         <p class="font-bold text-slate-800">{{ $q->patient->name }}</p>
-                                        <p class="text-xs text-slate-500">{{ $q->created_at->format('H:i A') }}</p>
+                                        <div class="flex flex-col gap-0.5">
+                                            @if($q->patient->nik)
+                                                <p class="text-[11px] text-slate-500 font-medium">NIK: {{ $q->patient->nik }}</p>
+                                            @endif
+                                            <p class="text-[11px] text-slate-400">{{ $q->created_at->format('H:i') }}</p>
+                                        </div>
+                                        {{-- Show priority on mobile since column is hidden --}}
+                                        <div class="sm:hidden mt-1">
+                                            <span class="{{ $q->priority == 'darurat' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-100 text-blue-700 border-blue-200' }} py-0.5 px-2 rounded text-[10px] font-bold uppercase tracking-wider border">
+                                                {{ $q->priority }} ({{ $q->total_score }})
+                                            </span>
+                                        </div>
                                     </td>
-                                    <td class="p-4">
+                                    <td class="p-3 sm:p-4 hidden sm:table-cell">
                                         <div class="flex flex-col items-start gap-1">
                                             <span
                                                 class="{{ $q->priority == 'darurat' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-100 text-blue-700 border-blue-200' }} py-0.5 px-2 rounded text-[10px] font-bold uppercase tracking-wider border">
@@ -99,7 +117,7 @@
                                                 {{ $q->total_score }}</span>
                                         </div>
                                     </td>
-                                    <td class="p-4">
+                                    <td class="p-3 sm:p-4 hidden md:table-cell">
                                         @php
                                             $statusLabel = ucfirst($q->status);
                                             $colorStr = 'text-amber-600 bg-amber-500';
@@ -116,32 +134,34 @@
                                             <span class="w-2 h-2 rounded-full {{ $bgColors }}"></span> {{ $statusLabel }}
                                         </div>
                                     </td>
-                                    <td class="p-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                    <td class="p-3 sm:p-4 text-right">
+                                        <div class="flex items-center justify-end gap-1 sm:gap-2 flex-wrap">
                                             @if($q->status == 'menunggu')
                                                 <form method="POST" action="/staff/queue/{{$q->id}}/call">
                                                     @csrf
                                                     <button
-                                                        class="px-3 py-1.5 rounded bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 transition">
+                                                        class="px-2 sm:px-3 py-1.5 rounded bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 transition">
                                                         Panggil
                                                     </button>
                                                 </form>
                                             @endif
                                             @if($q->status == 'dipanggil')
                                                 <a href="/staff/emr/{{$q->id}}"
-                                                    class="px-3 py-1.5 rounded bg-white border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-50 transition">
-                                                    Input EMR
+                                                    class="px-2 sm:px-3 py-1.5 rounded bg-white border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-50 transition">
+                                                    EMR
                                                 </a>
                                             @endif
-                                            <a href="/staff/screening/{{$q->id}}"
-                                                class="px-3 py-1.5 rounded bg-green-50 text-green-700 border border-green-200 font-medium text-xs hover:bg-green-100 transition">
-                                                Skrining
-                                            </a>
-                                            <form method="POST" action="/staff/queue/{{$q->id}}/cancel">
-                                                @csrf
-                                                <button
-                                                    class="px-2 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100">Batal</button>
-                                            </form>
+                                            @if(in_array($q->status, ['menunggu', 'dipanggil']))
+                                                <a href="/staff/screening/{{$q->id}}"
+                                                    class="px-2 sm:px-3 py-1.5 rounded bg-green-50 text-green-700 border border-green-200 font-medium text-xs hover:bg-green-100 transition">
+                                                    Skrining
+                                                </a>
+                                                <form method="POST" action="/staff/queue/{{$q->id}}/cancel">
+                                                    @csrf
+                                                    <button
+                                                        class="px-2 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 text-xs font-medium">Batal</button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
