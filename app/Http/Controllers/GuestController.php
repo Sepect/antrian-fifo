@@ -24,9 +24,12 @@ class GuestController extends Controller
 
         if ($request->patient_type === 'lama') {
             $request->validate([
-                'medical_record_number' => 'required|string|exists:patients,medical_record_number',
+                'patient_id' => 'required|exists:patients,id',
+            ], [
+                'patient_id.required' => 'Silakan pilih nama pasien dari daftar pencarian.',
+                'patient_id.exists' => 'Silakan pilih nama pasien dari daftar pencarian.',
             ]);
-            $patient = Patient::where('medical_record_number', strtoupper($request->medical_record_number))->first();
+            $patient = Patient::findOrFail($request->patient_id);
         } else {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -75,7 +78,7 @@ class GuestController extends Controller
             'screening_notes' => $request->complaint,
         ]);
 
-        return redirect('/status-display?medical_record_number=' . urlencode($patient->medical_record_number))
+        return redirect('/status-display?patient_id=' . $patient->id)
             ->with('registration_success', [
                 'number' => $queueNumber,
                 'rm' => $patient->medical_record_number,
@@ -91,15 +94,24 @@ class GuestController extends Controller
     public function trackDisplay(Request $request)
     {
         $request->validate([
-            'medical_record_number' => 'required|string',
+            'patient_id' => 'required_without:medical_record_number|nullable|exists:patients,id',
+            'medical_record_number' => 'required_without:patient_id|nullable|string',
+        ], [
+            'patient_id.required_without' => 'Silakan pilih nama pasien dari daftar pencarian.',
+            'patient_id.exists' => 'Silakan pilih nama pasien dari daftar pencarian.',
         ]);
 
-        $rm = strtoupper($request->medical_record_number);
-
-        $queue = Queue::with('patient')->where('queue_date', Carbon::today())
-            ->whereHas('patient', function($q) use ($rm) {
-                $q->where('medical_record_number', $rm);
-            })
+        $queue = Queue::with('patient')
+            ->where('queue_date', Carbon::today())
+            ->when(
+                $request->filled('patient_id'),
+                fn($q) => $q->where('patient_id', $request->patient_id),
+                // Fallback: URL/bookmark lama masih memakai nomor rekam medis.
+                fn($q) => $q->whereHas('patient', fn($p) => $p->where(
+                    'medical_record_number',
+                    strtoupper($request->medical_record_number)
+                ))
+            )
             ->latest()
             ->first();
 

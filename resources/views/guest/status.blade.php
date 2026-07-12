@@ -10,7 +10,7 @@
             </svg>
         </div>
         <h1 class="text-2xl font-bold text-blue-900 mb-2">Cek Status Antrian</h1>
-        <p class="text-sm text-slate-600">Masukkan No Rekam Medis (RM) Anda untuk melacak posisi pelayanan tersisa secara live.</p>
+        <p class="text-sm text-slate-600">Cari dan pilih nama Anda untuk melacak posisi pelayanan tersisa secara live.</p>
     </div>
 
     @if(session('error'))
@@ -20,12 +20,20 @@
     </div>
     @endif
 
+    @if($errors->any())
+    <div class="w-full bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r shadow-sm">
+        <p class="font-bold text-sm">Pencarian Gagal</p>
+        <ul class="list-disc list-inside text-sm mt-1">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <div class="w-full bg-white border border-slate-200 rounded-xl shadow-sm p-6 sm:p-8">
         <form method="GET" action="/status-display" class="space-y-5">
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2 text-center">Nomor Rekam Medis (RM)</label>
-                <input type="text" name="medical_record_number" required placeholder="Contoh: RM-0001" class="w-full px-4 py-4 rounded-md border-2 border-slate-300 bg-white focus:ring-0 focus:border-blue-600 outline-none transition-colors text-slate-800 font-black tracking-widest text-center uppercase text-xl placeholder-slate-300">
-            </div>
+            <x-patient-search label="Nama Pasien" placeholder="Contoh: Budi Santoso" :required="true" />
 
             <div class="pt-4">
                 <button type="submit" class="w-full py-4 rounded-md bg-blue-900 hover:bg-black text-white font-bold transition-colors uppercase tracking-widest">

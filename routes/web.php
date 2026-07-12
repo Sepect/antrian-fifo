@@ -12,6 +12,11 @@ Route::post('/register', [GuestController::class, 'processRegister']);
 Route::get('/status', [GuestController::class, 'showStatus']);
 Route::get('/status-display', [GuestController::class, 'trackDisplay']); // Using GET to make it easy to copy-paste URLs or refresh
 
+// Dropdown pencarian nama pasien. Publik karena dipakai halaman guest; dibatasi rate limit
+// dan tidak pernah mengembalikan No. RM maupun NIK.
+Route::get('/patients/search', [\App\Http\Controllers\PatientController::class, 'search'])
+    ->middleware('throttle:30,1');
+
 // Auth
 Route::get('/login', [StaffController::class, 'showLogin'])->name('login');
 Route::post('/login', [StaffController::class, 'processLogin']);
@@ -54,9 +59,12 @@ Route::middleware('auth')->prefix('staff')->group(function () {
 
             if ($request->patient_type === 'lama') {
                 $request->validate([
-                    'medical_record_number' => 'required|string|exists:patients,medical_record_number',
+                    'patient_id' => 'required|exists:patients,id',
+                ], [
+                    'patient_id.required' => 'Silakan pilih nama pasien dari daftar pencarian.',
+                    'patient_id.exists' => 'Silakan pilih nama pasien dari daftar pencarian.',
                 ]);
-                $patient = \App\Models\Patient::where('medical_record_number', strtoupper($request->medical_record_number))->first();
+                $patient = \App\Models\Patient::findOrFail($request->patient_id);
             } else {
                 $request->validate([
                     'name' => 'required|string|max:255',
@@ -107,7 +115,7 @@ Route::middleware('auth')->prefix('staff')->group(function () {
                 'booking_code' => strtoupper(\Illuminate\Support\Str::random(6)),
                 'screening_notes' => $request->complaint,
             ]);
-            return redirect('/staff/dashboard')->with('message', 'Pasien ' . $patient->medical_record_number . ' antrean no. ' . $queueNumber);
+            return redirect('/staff/dashboard')->with('message', 'Pasien ' . $patient->name . ' (' . $patient->medical_record_number . ') antrean no. ' . $queueNumber);
         });
 
         Route::get('/emr/{queue?}', [MedicalRecordController::class, 'create']);

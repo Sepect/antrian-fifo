@@ -35,12 +35,9 @@
             <!-- Tab Pasien Lama -->
             <div x-show="tab === 'lama'" class="space-y-4">
                 <div class="bg-blue-50 p-3 sm:p-4 rounded border border-blue-100 mb-4">
-                    <p class="text-sm text-blue-800">Jika Anda sudah pernah berobat ke klinik kami, Anda tidak perlu mengisi ulang seluruh biodata. Cukup masukkan No. RM Anda.</p>
+                    <p class="text-sm text-blue-800">Jika Anda sudah pernah berobat ke klinik kami, Anda tidak perlu mengisi ulang seluruh biodata. Cukup cari dan pilih nama Anda.</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">No. Rekam Medis (RM) <span class="text-red-500">*</span></label>
-                    <input type="text" name="medical_record_number" placeholder="Contoh: RM-0001" :required="tab === 'lama'" class="w-full px-4 py-3 rounded-md border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors text-slate-800 font-bold tracking-wider text-lg sm:text-xl uppercase">
-                </div>
+                <x-patient-search label="Nama Pasien" placeholder="Contoh: Budi Santoso" :required="true" />
             </div>
 
             <!-- Tab Pasien Baru -->

@@ -29,10 +29,7 @@
 
             <!-- Tab Pasien Lama -->
             <div x-show="tab === 'lama'" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">No. Rekam Medis (RM) <span class="text-red-500">*</span></label>
-                    <input type="text" name="medical_record_number" placeholder="RM-XXXX" :required="tab === 'lama'" class="w-full px-4 py-2 border border-slate-300 rounded focus:border-blue-500 outline-none text-lg font-bold uppercase transition">
-                </div>
+                <x-patient-search label="Nama Pasien" placeholder="Ketik nama pasien..." :required="true" />
             </div>
 
             <!-- Tab Pasien Baru -->

@@ -23,6 +23,36 @@ class PatientController extends Controller
         return view('staff.patients.index', compact('patients'));
     }
 
+    public function search(Request $request)
+    {
+        $term = strtolower(trim($request->query('q', '')));
+
+        if (mb_strlen($term) < 2) {
+            return response()->json([]);
+        }
+
+        // Escape wildcard LIKE, jika tidak query "%" akan mencocokkan seluruh pasien.
+        $escaped = addcslashes($term, '%_\\');
+
+        $patients = Patient::whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'gender', 'birth_date']);
+
+        return response()->json($patients->map(fn (Patient $patient) => [
+            'id' => $patient->id,
+            'name' => $patient->name,
+            // Data lama hasil import menyimpan "LAKI-LAKI"/"Perempuan", pendaftaran baru
+            // menyimpan "L"/"P". Samakan lewat huruf pertama.
+            'gender_label' => match (strtoupper(substr((string) $patient->gender, 0, 1))) {
+                'L' => 'Laki-laki',
+                'P' => 'Perempuan',
+                default => null,
+            },
+            'birth_date_label' => $patient->birth_date?->translatedFormat('d M Y'),
+        ]));
+    }
+
     public function show($id)
     {
         $patient = Patient::with(['medicalRecords' => function ($query) {
