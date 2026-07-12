@@ -137,6 +137,8 @@ Route::middleware('auth')->prefix('staff')->group(function () {
         Route::get('/import', [\App\Http\Controllers\Admin\ImportController::class, 'index'])->name('admin.import.index');
         Route::post('/import', [\App\Http\Controllers\Admin\ImportController::class, 'store'])->name('admin.import.store');
 
+        Route::get('/export', [\App\Http\Controllers\Admin\ExportController::class, 'download'])->name('admin.export');
+
         Route::get('/polyclinics', [\App\Http\Controllers\Admin\PolyclinicController::class, 'index'])->name('admin.polyclinics.index');
         Route::post('/polyclinics', [\App\Http\Controllers\Admin\PolyclinicController::class, 'store'])->name('admin.polyclinics.store');
         Route::post('/polyclinics/{polyclinic}/update', [\App\Http\Controllers\Admin\PolyclinicController::class, 'update'])->name('admin.polyclinics.update');

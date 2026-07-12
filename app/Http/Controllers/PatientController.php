@@ -42,13 +42,7 @@ class PatientController extends Controller
         return response()->json($patients->map(fn (Patient $patient) => [
             'id' => $patient->id,
             'name' => $patient->name,
-            // Data lama hasil import menyimpan "LAKI-LAKI"/"Perempuan", pendaftaran baru
-            // menyimpan "L"/"P". Samakan lewat huruf pertama.
-            'gender_label' => match (strtoupper(substr((string) $patient->gender, 0, 1))) {
-                'L' => 'Laki-laki',
-                'P' => 'Perempuan',
-                default => null,
-            },
+            'gender_label' => $patient->gender_label,
             'birth_date_label' => $patient->birth_date?->translatedFormat('d M Y'),
         ]));
     }

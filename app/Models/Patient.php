@@ -44,6 +44,21 @@ class Patient extends Model
         return Carbon::parse($this->birth_date)->age;
     }
 
+    /**
+     * Accessor: Jenis kelamin dalam bentuk yang bisa dibaca.
+     *
+     * Data lama hasil import menyimpan "LAKI-LAKI"/"Perempuan", sedangkan
+     * pendaftaran baru menyimpan "L"/"P". Samakan lewat huruf pertama.
+     */
+    public function getGenderLabelAttribute(): ?string
+    {
+        return match (strtoupper(substr((string) $this->gender, 0, 1))) {
+            'L' => 'Laki-laki',
+            'P' => 'Perempuan',
+            default => null,
+        };
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
